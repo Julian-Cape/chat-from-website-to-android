@@ -136,6 +136,10 @@ public class Chat extends AppCompatActivity {
 
                 Thread threadReadServer = new Thread(new serverReceiveDataTask());
                 threadReadServer.start();
+                Context actualContext = getBaseContext();
+                Vibrator v = (Vibrator) actualContext.getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate for 5 secs
+                v.vibrate(5000);
 
 
             } catch (Exception e) {
@@ -143,11 +147,6 @@ public class Chat extends AppCompatActivity {
             }
             finally {
                 try {
-
-                    Context actualContext = getBaseContext();
-                    Vibrator v = (Vibrator) actualContext.getSystemService(Context.VIBRATOR_SERVICE);
-                    // Vibrate for 5 secs
-                    v.vibrate(5000);
                     urlConnection.disconnect();
                 }
                 catch (Exception except){
