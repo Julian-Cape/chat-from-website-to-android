@@ -11,6 +11,7 @@ SERVER_PHP folder: it contains php code to be uploaded to the website, it handle
 MOBILE_SRC folder: it contains source code to be insert to an android app project, it handles communication from the mobile app to the client who opened a chat on the website
  - open points:
   -> manage app power saving
+  -> manage rotation of screen!
   -> wake up the app when there is a chat incoming
   -> manage multiple incoming chats
   -> add close chat connection
