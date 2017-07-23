@@ -3,9 +3,9 @@
       date_default_timezone_set('UTC');
 
       $servername="localhost";
-      $username=""; //insert your value!
-      $password="";//insert your value!
-      $databasename="";//insert your value!
+      $username="";//insert your sql username 
+      $password="";//insert your sql password 
+      $databasename="mydb_sqli";
       $newtable="mobileapp_service";  
 
 
@@ -24,7 +24,7 @@
         $conn = new mysqli($servername, $username, $password, $databasename);        
 
         if($conn->connect_error){
-           die("error1: please contact the admin");
+           echo "error1: please contact the admin";
         }  
 
         $sql ="SELECT newtextmobile FROM ".$newtable." LIMIT 1 OFFSET 0";
@@ -39,7 +39,7 @@
         }
         else
         {
-          die("error2: please contact the admin");
+          echo "error2: please contact the admin";
         }
 
         if($newtextmobile == false)
@@ -95,7 +95,7 @@
       }
       else
       {
-        die("error4: please contact the admin");
+        echo "error4: please contact the admin";
       }
 
 
