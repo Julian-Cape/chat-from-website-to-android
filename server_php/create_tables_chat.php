@@ -1,9 +1,9 @@
 <?php
 
      $servername="localhost";
-     $username="";//insert your value! 
-     $password="";//insert your value!
-     $databasename="";//insert your value!
+     $username="";//insert your sql username 
+     $password="";//insert your sql password 
+     $databasename="mydb_sqli";
 
      $newtable="create_chat";
 
@@ -12,7 +12,7 @@
      $conn = new mysqli($servername, $username, $password, $databasename);     
 
      if($conn->connect_error){
-        die("error9: please contact the admin");
+        echo "error9: please contact the admin";
      }  
 
 
