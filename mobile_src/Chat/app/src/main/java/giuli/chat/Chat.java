@@ -1,8 +1,10 @@
 package giuli.chat;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.text.method.MovementMethod;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -36,8 +38,13 @@ public class Chat extends AppCompatActivity {
     Button sendButton;
     CharSequence textEdited = "";
     String stringEdited = "";
-    TextView readReceivedText;
-    String dataFromServer_global="";
+    protected static TextView readReceivedText;
+    protected static String dataFromServer_global="";
+    protected static Boolean chatOngoing = false;
+    protected Alarm alarm;
+
+    protected static NotificationCompat.Builder chatAppNotification;
+    protected static final int uniqueID = 34923;
 
     ScrollingMovementMethod scrollReceivedText = new ScrollingMovementMethod();
 
@@ -46,15 +53,12 @@ public class Chat extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        new serverPollingTask().execute();
-
         chatMainLayout = (ViewGroup) findViewById(R.id.activity_chat);
 
         editText = (EditText) findViewById(R.id.textReply);
         sendButton = (Button) findViewById(R.id.sendButton);
         readReceivedText = (TextView) findViewById(R.id.textReceived);
 
-        //readReceivedText.setMovementMethod(new ScrollingMovementMethod());
         readReceivedText.setMovementMethod(scrollReceivedText);
 
         //startService(new Intent(getBaseContext(),serverPollingService.class));
@@ -73,6 +77,22 @@ public class Chat extends AppCompatActivity {
             }
         });
 
+        if(!chatOngoing)
+        {
+            Alarm alarm = new Alarm();
+            Toast.makeText(this, "Alarm Started", Toast.LENGTH_LONG).show();
+            alarm.setAlarm(this);
+        }
+
+        chatAppNotification = new NotificationCompat.Builder(this);
+        chatAppNotification.setAutoCancel(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        alarm.cancelAlarm(this);
+
     }
 
     public void sendYourText(){
@@ -85,7 +105,6 @@ public class Chat extends AppCompatActivity {
 
         hideYourKeyboard();
         new serverSendDataTask().execute(stringEdited);
-        //stopService(new Intent(getBaseContext(),serverPollingService.class));
 
     }
 
@@ -98,78 +117,6 @@ public class Chat extends AppCompatActivity {
             immKeyboard.hideSoftInputFromWindow(contextView.getWindowToken(), 0);
         }
 
-    }
-
-    //public void startService(View view) {
-      //  startService(new Intent(getBaseContext(),serverPollingService.class));
-    //}
-
-    //public void stopService(View view) {
-      //  stopService(new Intent(getBaseContext(),serverPollingService.class));
-    //}
-
-    private class serverPollingTask extends AsyncTask<String, Void, String> {
-
-        HttpURLConnection urlConnection;
-        String dataFromServer = "";
-
-        @Override
-        protected String doInBackground(String... urlString) {
-
-            try {
-                while(!dataFromServer.equals("1"))
-                {
-                    URL url = new URL("http://www.bravedigit.com/php/create_chat.php");
-
-                    urlConnection = (HttpURLConnection) url.openConnection();
-
-                    urlConnection.setConnectTimeout(10000);
-                    urlConnection.setChunkedStreamingMode(0);
-
-                    InputStream inputStreamChat = new BufferedInputStream(urlConnection.getInputStream());
-                    dataFromServer = readStream(inputStreamChat);
-
-                    urlConnection.disconnect();
-
-                    Thread.sleep(10000);
-                }
-
-                Thread threadReadServer = new Thread(new serverReceiveDataTask());
-                threadReadServer.start();
-                Context actualContext = getBaseContext();
-                Vibrator v = (Vibrator) actualContext.getSystemService(Context.VIBRATOR_SERVICE);
-                // Vibrate for 5 secs
-                v.vibrate(5000);
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            finally {
-                try {
-                    urlConnection.disconnect();
-                }
-                catch (Exception except){
-                    except.printStackTrace();
-                }
-            }
-
-            return null;
-        }
-    }
-
-    private String readStream(InputStream is) {
-        try {
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            int i = is.read();
-            while(i != -1) {
-                bo.write(i);
-                i = is.read();
-            }
-            return bo.toString();
-        } catch (IOException e) {
-            return "";
-        }
     }
 
     private  boolean writeStream(OutputStream os, String outputString) {
@@ -235,67 +182,22 @@ public class Chat extends AppCompatActivity {
         }
     }
 
-    private class serverReceiveDataTask implements Runnable{
 
-        HttpURLConnection urlConnection;
-        String dataFromServer = "";
-
-        @Override
-        public void run() {
-
-            try
-            {
-               while(true)
-               {
-
-                   try {
-                       URL url = new URL("http://www.bravedigit.com/php/mobilechat_in.php");
-
-                       urlConnection = (HttpURLConnection) url.openConnection();
-
-                       urlConnection.setReadTimeout(10000);
-                       urlConnection.setChunkedStreamingMode(0);
-
-                       InputStream inputStreamChat = new BufferedInputStream(urlConnection.getInputStream());
-                       dataFromServer = readStream(inputStreamChat);
-
-                       if(!dataFromServer.equals("")) {
-
-                           readReceivedText = (TextView) findViewById(R.id.textReceived);
-
-                           dataFromServer_global += "\nCLIENT - ";
-                           dataFromServer_global += dataFromServer;
-
-                           runOnUiThread(new Runnable() {
-                               @Override
-                               public void run() {
-                                   readReceivedText.setText(dataFromServer_global);
-                               }
-                           });
-
-                       }
-
-                       urlConnection.disconnect();
-                   }
-                   catch (IOException except)
-                   {
-                       except.printStackTrace();
-                   }
-                   catch (Exception except)
-                   {
-                       except.printStackTrace();
-                   }
-
-                   Thread.sleep(4000);
-
-               }
-
+    private String readStream(InputStream is) {
+        try {
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            int i = is.read();
+            while(i != -1) {
+                bo.write(i);
+                i = is.read();
             }
-            catch (InterruptedException except) {
-                except.printStackTrace();
-            }
-
+            return bo.toString();
+        } catch (IOException e) {
+            return "";
         }
     }
 
+
 }
+
+
