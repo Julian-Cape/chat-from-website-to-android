@@ -3,9 +3,9 @@
      date_default_timezone_set('UTC');
 
      $servername="localhost";
-     $username=""; //insert your value!
-     $password="";//insert your value!
-     $databasename="";//insert your value!
+     $username="";//insert your sql username 
+     $password="";//insert your sql password 
+     $databasename="mydb_sqli";
      $newtable="create_chat";
 
      $chatongoing = false;
@@ -14,7 +14,7 @@
      $conn = new mysqli($servername, $username, $password, $databasename);     
 
      if($conn->connect_error){
-        die("error9: please contact the admin");
+        echo "error9: please contact the admin" ;
      }  
 
      $sql ="SELECT chatongoing FROM ".$newtable." LIMIT 1 OFFSET 0";
@@ -28,7 +28,7 @@
      }
      else
      {
-       die("error10: please contact the admin");
+       echo "error10: please contact the admin";
      }
 
 
