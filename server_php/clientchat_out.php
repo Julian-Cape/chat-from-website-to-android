@@ -3,9 +3,9 @@
       date_default_timezone_set('UTC');
 
       $servername="localhost";
-      $username=""; //insert your value!
-      $password="";//insert your value!
-      $databasename="";//insert your value!
+      $username="";//insert your sql username
+      $password="";//insert your sql password
+      $databasename="mydb_sqli";
       $newtable="clientapp_service";  
 
 
