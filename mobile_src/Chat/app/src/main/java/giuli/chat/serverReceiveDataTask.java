@@ -31,12 +31,14 @@ public class serverReceiveDataTask implements Runnable{
                     InputStream inputStreamChat = new BufferedInputStream(urlConnection.getInputStream());
                     dataFromServer = readStream(inputStreamChat);
 
-                    if(!dataFromServer.equals("")) {
+                    if((!dataFromServer.equals("")) || (Chat.chatOpened== true) ) {
 
                         //readReceivedText = (TextView) findViewById(R.id.textReceived);
 
                         Chat.dataFromServer_global += "\nCLIENT - ";
                         Chat.dataFromServer_global += dataFromServer;
+
+                        Chat.chatOpened = false;
 
                         //Thread updateReceivedText = new Thread(new runUpdateReceivedText());
                         //updateReceivedText.start();
